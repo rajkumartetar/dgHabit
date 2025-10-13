@@ -1,32 +1,35 @@
-# Flutter/Dart
+# Flutter/Dart/Pub related
 .dart_tool/
 .packages
 .flutter-plugins
 .flutter-plugins-dependencies
 .metadata
+pubspec.lock
 
 # Build outputs
 build/
-**/build/
-
-# Platform-specific
-android/.gradle/
-android/local.properties
 ios/Pods/
-macos/Pods/
+android/.gradle/
+android/app/build/
+android/build/
 linux/build/
-windows/build/
+macos/Pods/
+windows/runner/Release/
+windows/runner/Debug/
 
-# IDE/project files
+# IDE settings
 .idea/
-*.iml
 .vscode/
-.DS_Store
+*.iml
 
-# Logs and temp
+# Generated assets
+flutter_native_splash.yaml
+
+# Misc
 *.log
-pubspec.lock # keep or remove based on team policy; apps may commit this
-# Miscellaneous
+*.DS_Store
+coverage/
+web_previews/# Miscellaneous
 *.class
 *.log
 *.pyc
