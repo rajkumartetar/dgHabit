@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dgHabit • Splash Preview</title>
+<style>
+:root{
+  --surface:#f8f9fb;
+  --on-surface:#1d1b20;
+  --on-surface-variant:#49454f;
+  --primary:#6750a4;
+  --tertiary:#00bfa6;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --surface:#121212;
+    --on-surface:#e6e1e5;
+    --on-surface-variant:#cac4d0;
+    --primary:#d0bcff;
+    --tertiary:#66fff3;
+  }
+}
+html,body{height:100%}
+body{
+  margin:0;
+  background: var(--surface);
+  background-image: linear-gradient(135deg, color-mix(in oklab, var(--primary) 85%, transparent), color-mix(in oklab, var(--tertiary) 75%, transparent));
+  display:flex; align-items:center; justify-content:center;
+  color:var(--on-surface); font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+}
+.card{
+  text-align:center;
+  animation: fadeIn 600ms ease-out forwards, scaleIn 600ms ease-out forwards;
+  opacity:0; transform: scale(.985);
+}
+.hero{
+  width:min(max(120px, 22vmin), 220px);
+  height:min(max(120px, 22vmin), 220px);
+  display:block; margin:0 auto;
+  object-fit: contain;
+  border-radius: 28px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.08);
+  background: color-mix(in oklab, var(--surface) 60%, transparent);
+}
+.wordmark{ margin-top:16px; }
+.subtitle{ margin-top:8px; color:var(--on-surface-variant) }
+.progress{
+  width:min(max(120px, 8vmin), 180px); height:4px;
+  margin:20px auto 0; border-radius:4px; overflow:hidden;
+  background: color-mix(in oklab, var(--on-surface) 6%, transparent);
+}
+.progress > span{
+  display:block; height:100%; background: var(--primary);
+  width:40%; animation: indeterminate 1.5s infinite;
+}
+@keyframes fadeIn{to{opacity:1}}
+@keyframes scaleIn{to{transform:scale(1)}}
+@keyframes indeterminate{ 0%{margin-left:-40%} 50%{margin-left:60%} 100%{margin-left:100%} }
+.sparkle{
+  position:absolute; top:10%; opacity:.3; pointer-events:none;
+  width:min(max(120px, 22vmin), 220px);
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <img id="sparkle" class="sparkle" src="" alt="">
+  <img id="brand-icon" class="hero" src="../assets/brand/icon_1024.png" alt="App icon" onerror="this.src='../web/favicon.png'">
+  <div class="wordmark">
+    <object id="wordmark-svg" type="image/svg+xml" data="../assets/brand/wordmark.svg" width="200"></object>
+    <noscript><h1>dgHabit</h1></noscript>
+  </div>
+  <div class="subtitle">Build habits, day by day</div>
+  <div class="progress"><span></span></div>
+</div>
+<script>
+// Optional: If you later want to include a Lottie sparkle, you can swap the #sparkle src to an animated GIF or integrate lottie-web.
+</script>
+</body>
+</html>

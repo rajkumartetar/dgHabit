@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "874543416631",
+    "project_id": "s3-projectdghabit",
+    "storage_bucket": "s3-projectdghabit.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:874543416631:android:2638a3e6d3b652ddbf46b2",
+        "android_client_info": {
+          "package_name": "com.example.dghabit"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwx_Sjxnb_03bjGwBmkXg1G8ARy85Agbc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
