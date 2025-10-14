@@ -219,9 +219,133 @@ void main() {
             fake,
           ),
         );
+        // Test-safe previews (no SVGs, no timers) for Splash and Onboarding
+        await capture('splash', _appShell(const _SplashPreview(), fake));
+        await capture('onboarding', _appShell(const _OnboardingPreview(), fake));
       }, config: GoldenToolkitConfiguration(
         fileNameFactory: (name) => 'docs/screenshots/' + name + '.png',
       ));
     });
   });
+}
+
+class _SplashPreview extends StatelessWidget {
+  const _SplashPreview();
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final size = MediaQuery.of(context).size;
+    final hero = size.shortestSide.clamp(120.0, 220.0);
+    return Scaffold(
+      backgroundColor: scheme.surface,
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(28),
+              child: Image.asset(
+                'assets/brand/icon_1024.png',
+                width: hero * 0.8,
+                height: hero * 0.8,
+                fit: BoxFit.contain,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text('dgHabit', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700)),
+            const SizedBox(height: 8),
+            Text('Build habits, day by day', style: Theme.of(context).textTheme.bodyMedium),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: hero * 0.35,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(2),
+                child: LinearProgressIndicator(
+                  value: 0.66,
+                  backgroundColor: scheme.onSurface.withOpacity(0.06),
+                  color: scheme.primary,
+                  minHeight: 4,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _OnboardingPreview extends StatelessWidget {
+  const _OnboardingPreview();
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Scaffold(
+      appBar: AppBar(title: const Text('Welcome'), actions: [TextButton(onPressed: () {}, child: const Text('Skip'))]),
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.asset('assets/brand/icon_1024.png', width: 56, height: 56, fit: BoxFit.contain),
+                ),
+                const SizedBox(width: 10),
+                Text('dgHabit', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800, letterSpacing: .2)),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: scheme.surface,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: scheme.outlineVariant.withOpacity(0.25)),
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.timeline, size: 96, color: scheme.primary),
+                        const SizedBox(height: 16),
+                        Text('Track your day', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800), textAlign: TextAlign.center),
+                        const SizedBox(height: 8),
+                        Text('Log activities with smart continuity that fills gaps.', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: scheme.onSurfaceVariant), textAlign: TextAlign.center),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(3, (i) => Container(
+                margin: const EdgeInsets.symmetric(horizontal: 5),
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: i==0? scheme.primary: scheme.outlineVariant.withOpacity(0.6), width: 1.6)),
+                child: Container(margin: const EdgeInsets.all(2.2), decoration: BoxDecoration(color: i==0? scheme.primary: Colors.transparent, shape: BoxShape.circle)),
+              )),
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Row(
+                children: [
+                  TextButton(onPressed: () {}, child: const Text('Skip')),
+                  const Spacer(),
+                  FilledButton.icon(onPressed: () {}, icon: const Icon(Icons.arrow_forward), label: const Text('Next')),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
