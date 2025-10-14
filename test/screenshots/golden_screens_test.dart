@@ -189,22 +189,20 @@ void main() {
         await tester.pumpDeviceBuilder(builder);
         await screenMatchesGolden(tester, 'all_screens');
 
-        // Also capture separate PNGs for each screen with a title overlay
-        Future<void> capture(String fileName, String title, Widget widget) async {
-          final labeled = _withTitle(widget, title);
-          await tester.pumpWidgetBuilder(labeled, surfaceSize: Device.phone.size);
+        // Also capture separate PNGs for each screen as-is (no title overlay)
+        Future<void> capture(String fileName, Widget widget) async {
+          await tester.pumpWidgetBuilder(widget, surfaceSize: Device.phone.size);
           await screenMatchesGolden(tester, 'individual/' + fileName);
         }
 
-        await capture('home', 'Home', _appShell(const HomeScreen(), fake));
-        await capture('timeline', 'Timeline', _appShell(const TimelineScreen(), fake));
-        await capture('analytics', 'Analytics', _appShell(const AnalyticsScreen(), fake));
-        await capture('add_activity', 'Add Activity', _appShell(const AddActivityScreen(), fake));
-        await capture('settings', 'Settings', _appShell(const SettingsScreen(), fake));
-        await capture('category_manager', 'Category Manager', _appShell(const CategoryManagerScreen(), fake));
+        await capture('home', _appShell(const HomeScreen(), fake));
+        await capture('timeline', _appShell(const TimelineScreen(), fake));
+        await capture('analytics', _appShell(const AnalyticsScreen(), fake));
+        await capture('add_activity', _appShell(const AddActivityScreen(), fake));
+        await capture('settings', _appShell(const SettingsScreen(), fake));
+        await capture('category_manager', _appShell(const CategoryManagerScreen(), fake));
         await capture(
           'activity_detail',
-          'Activity Detail',
           _appShell(
             ActivityDetailScreen(
               activity: ActivityModel(
@@ -226,35 +224,4 @@ void main() {
       ));
     });
   });
-}
-
-/// Wraps a widget with a top translucent title band so the PNG includes a readable title.
-Widget _withTitle(Widget child, String title) {
-  return Stack(
-    fit: StackFit.expand,
-    children: [
-      child,
-      Align(
-        alignment: Alignment.topCenter,
-        child: Container(
-          width: double.infinity,
-          color: const Color(0xCC000000),
-          padding: const EdgeInsets.only(top: 8, bottom: 8),
-          child: SafeArea(
-            bottom: false,
-            child: Center(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    ],
-  );
 }
