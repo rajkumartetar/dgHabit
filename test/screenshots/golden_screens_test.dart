@@ -1,6 +1,7 @@
 // Golden screenshots for documentation. Generate images under docs/screenshots.
 // Run: flutter test --update-goldens test/screenshots/golden_screens_test.dart
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
@@ -157,6 +158,8 @@ void main() {
       TestWidgetsFlutterBinding.ensureInitialized();
       GoogleFonts.config.allowRuntimeFetching = false;
       await loadAppFonts();
+      // Ensure target folder for individual images exists
+      Directory('docs/screenshots/individual').createSync(recursive: true);
     });
 
     testGoldens('Capture key screens', (tester) async {
@@ -185,9 +188,73 @@ void main() {
 
         await tester.pumpDeviceBuilder(builder);
         await screenMatchesGolden(tester, 'all_screens');
+
+        // Also capture separate PNGs for each screen with a title overlay
+        Future<void> capture(String fileName, String title, Widget widget) async {
+          final labeled = _withTitle(widget, title);
+          await tester.pumpWidgetBuilder(labeled, surfaceSize: Device.phone.size);
+          await screenMatchesGolden(tester, 'individual/' + fileName);
+        }
+
+        await capture('home', 'Home', _appShell(const HomeScreen(), fake));
+        await capture('timeline', 'Timeline', _appShell(const TimelineScreen(), fake));
+        await capture('analytics', 'Analytics', _appShell(const AnalyticsScreen(), fake));
+        await capture('add_activity', 'Add Activity', _appShell(const AddActivityScreen(), fake));
+        await capture('settings', 'Settings', _appShell(const SettingsScreen(), fake));
+        await capture('category_manager', 'Category Manager', _appShell(const CategoryManagerScreen(), fake));
+        await capture(
+          'activity_detail',
+          'Activity Detail',
+          _appShell(
+            ActivityDetailScreen(
+              activity: ActivityModel(
+                activityId: 'detail2',
+                activityName: 'Leisure',
+                startTime: DateTime.now().subtract(const Duration(hours: 3)),
+                endTime: DateTime.now().subtract(const Duration(hours: 2, minutes: 15)),
+                category: 'Fun',
+                source: ActivitySource.manual,
+                steps: null,
+                screenTimeMinutes: 55,
+              ),
+            ),
+            fake,
+          ),
+        );
       }, config: GoldenToolkitConfiguration(
         fileNameFactory: (name) => 'docs/screenshots/' + name + '.png',
       ));
     });
   });
+}
+
+/// Wraps a widget with a top translucent title band so the PNG includes a readable title.
+Widget _withTitle(Widget child, String title) {
+  return Stack(
+    fit: StackFit.expand,
+    children: [
+      child,
+      Align(
+        alignment: Alignment.topCenter,
+        child: Container(
+          width: double.infinity,
+          color: const Color(0xCC000000),
+          padding: const EdgeInsets.only(top: 8, bottom: 8),
+          child: SafeArea(
+            bottom: false,
+            child: Center(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ],
+  );
 }
