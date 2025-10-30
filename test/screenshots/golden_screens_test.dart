@@ -178,6 +178,7 @@ void main() {
           ..addScenario(widget: _appShell(const PermissionsScreen(), fake), name: 'Permissions')
           ..addScenario(widget: _appShell(const SettingsScreen(), fake), name: 'Settings')
           ..addScenario(widget: _appShell(const CategoryManagerScreen(), fake), name: 'CategoryManager')
+          ..addScenario(widget: const _QuickActionsPreview(), name: 'QuickActionsSheet')
           ..addScenario(widget: _appShell(ActivityDetailScreen(
             activity: ActivityModel(
               activityId: 'detail1',
@@ -251,6 +252,7 @@ void main() {
         // Test-safe previews (no SVGs, no timers) for Splash and Onboarding
         await capture('splash', _appShell(const _SplashPreview(), fake));
         await capture('onboarding', _appShell(const _OnboardingPreview(), fake));
+        await capture('sheet_quick_actions', const _QuickActionsPreview());
       }, config: GoldenToolkitConfiguration(
         // Resolve goldens to the project root docs/ folder regardless of test working dir
         fileNameFactory: (name) => '../../docs/screenshots/' + name + '.png',
@@ -374,6 +376,56 @@ class _OnboardingPreview extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _QuickActionsPreview extends StatelessWidget {
+  const _QuickActionsPreview();
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(useMaterial3: true),
+      home: Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                  child: Text(
+                    'Quick Actions',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+                Divider(height: 1),
+                ListTile(
+                  dense: true,
+                  visualDensity: VisualDensity.compact,
+                  leading: Icon(Icons.timelapse_outlined),
+                  title: Text('Record screen time (today)'),
+                ),
+                ListTile(
+                  dense: true,
+                  visualDensity: VisualDensity.compact,
+                  leading: Icon(Icons.flag_circle_outlined),
+                  title: Text('Show today steps'),
+                ),
+                ListTile(
+                  dense: true,
+                  visualDensity: VisualDensity.compact,
+                  leading: Icon(Icons.directions_walk),
+                  title: Text('Start steps session'),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
