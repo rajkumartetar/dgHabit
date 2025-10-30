@@ -164,3 +164,31 @@ flutter run
 ```
 
 Configure Firebase with `google-services.json` (Android) and `GoogleService-Info.plist` (iOS) as applicable.
+
+## 15. Appendix C: Export to DOCX/PDF/RTF (Pandoc)
+
+Optional: Use Pandoc to export this Markdown document to common academic formats.
+
+Install Pandoc (Windows):
+
+```powershell
+winget install Pandoc.Pandoc
+```
+
+Export to DOCX:
+
+```powershell
+pandoc -s docs/Academic_Documentation.md -o docs/Academic_Documentation.docx
+```
+
+Export to PDF (requires a TeX engine such as MiKTeX):
+
+```powershell
+pandoc -s docs/Academic_Documentation.md -o docs/Academic_Documentation.pdf --pdf-engine=xelatex
+```
+
+Export to RTF:
+
+```powershell
+pandoc -s docs/Academic_Documentation.md -o docs/Academic_Documentation.rtf
+```
