@@ -15,6 +15,7 @@ import 'package:dghabit/screens/timeline_screen.dart';
 import 'package:dghabit/screens/add_activity_screen.dart';
 import 'package:dghabit/screens/activity_detail_screen.dart';
 import 'package:dghabit/screens/settings_screen.dart';
+import 'package:dghabit/screens/permissions_screen.dart';
 import 'package:dghabit/screens/category_manager_screen.dart';
 import 'package:dghabit/models/activity_model.dart';
 import 'package:dghabit/providers/app_providers.dart';
@@ -171,6 +172,10 @@ void main() {
           ..addScenario(widget: _appShell(const TimelineScreen(), fake), name: 'Timeline')
           ..addScenario(widget: _appShell(const AnalyticsScreen(), fake), name: 'Analytics')
           ..addScenario(widget: _appShell(const AddActivityScreen(), fake), name: 'AddActivity')
+          ..addScenario(widget: _appShell(const SettingsScreen(inSheet: true), fake), name: 'SettingsSheet')
+          ..addScenario(widget: _appShell(const CategoryManagerScreen(inSheet: true), fake), name: 'CategoryManagerSheet')
+          ..addScenario(widget: _appShell(const PermissionsScreen(inSheet: true), fake), name: 'PermissionsSheet')
+          ..addScenario(widget: _appShell(const PermissionsScreen(), fake), name: 'Permissions')
           ..addScenario(widget: _appShell(const SettingsScreen(), fake), name: 'Settings')
           ..addScenario(widget: _appShell(const CategoryManagerScreen(), fake), name: 'CategoryManager')
           ..addScenario(widget: _appShell(ActivityDetailScreen(
@@ -199,8 +204,13 @@ void main() {
         await capture('timeline', _appShell(const TimelineScreen(), fake));
         await capture('analytics', _appShell(const AnalyticsScreen(), fake));
         await capture('add_activity', _appShell(const AddActivityScreen(), fake));
+        await capture('sheet_add_activity', _appShell(const AddActivityScreen(inSheet: true), fake));
         await capture('settings', _appShell(const SettingsScreen(), fake));
+        await capture('sheet_settings', _appShell(const SettingsScreen(inSheet: true), fake));
         await capture('category_manager', _appShell(const CategoryManagerScreen(), fake));
+        await capture('sheet_category_manager', _appShell(const CategoryManagerScreen(inSheet: true), fake));
+  await capture('sheet_permissions', _appShell(const PermissionsScreen(inSheet: true), fake));
+  await capture('permissions', _appShell(const PermissionsScreen(), fake));
         await capture(
           'activity_detail',
           _appShell(
@@ -219,11 +229,31 @@ void main() {
             fake,
           ),
         );
+        await capture(
+          'sheet_activity_detail',
+          _appShell(
+            ActivityDetailScreen(
+              inSheet: true,
+              activity: ActivityModel(
+                activityId: 'detail3',
+                activityName: 'Walk',
+                startTime: DateTime.now().subtract(const Duration(hours: 1, minutes: 30)),
+                endTime: DateTime.now().subtract(const Duration(minutes: 15)),
+                category: 'Health',
+                source: ActivitySource.manual,
+                steps: 1500,
+                screenTimeMinutes: null,
+              ),
+            ),
+            fake,
+          ),
+        );
         // Test-safe previews (no SVGs, no timers) for Splash and Onboarding
         await capture('splash', _appShell(const _SplashPreview(), fake));
         await capture('onboarding', _appShell(const _OnboardingPreview(), fake));
       }, config: GoldenToolkitConfiguration(
-        fileNameFactory: (name) => 'docs/screenshots/' + name + '.png',
+        // Resolve goldens to the project root docs/ folder regardless of test working dir
+        fileNameFactory: (name) => '../../docs/screenshots/' + name + '.png',
       ));
     });
   });
