@@ -1,16 +1,49 @@
-# dghabit
+# dgHabit
 
-A new Flutter project.
+Build habits, day by day — log activities, visualize trends, and grow.
 
-## Getting Started
+## Overview
 
-This project is a starting point for a Flutter application.
+- Flutter (Material 3), Riverpod, Firebase (Auth/Firestore)
+- Daily timeline with continuity handling (no-gap/overlap strategies)
+- Bottom-sheet UI for Add/Edit Activity, Settings, Permissions, and Category Manager
+- Analytics with weekly trends and category breakdowns
 
-A few resources to get you started if this is your first Flutter project:
+## Screenshots
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Composite: `docs/screenshots/all_screens.png`
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Key screens (see more under `docs/screenshots/individual/`):
+
+![Home](docs/screenshots/individual/home.png)
+![Timeline](docs/screenshots/individual/timeline.png)
+![Analytics](docs/screenshots/individual/analytics.png)
+![Add Activity (Sheet)](docs/screenshots/individual/sheet_add_activity.png)
+![Activity Detail (Sheet)](docs/screenshots/individual/sheet_activity_detail.png)
+![Settings (Sheet)](docs/screenshots/individual/sheet_settings.png)
+![Category Manager (Sheet)](docs/screenshots/individual/sheet_category_manager.png)
+![Permissions (Sheet)](docs/screenshots/individual/sheet_permissions.png)
+![Quick Actions (Sheet)](docs/screenshots/individual/sheet_quick_actions.png)
+
+## Development
+
+1) Install Flutter and set up platforms.
+2) Configure Firebase (google-services.json / GoogleService-Info.plist).
+3) Run:
+
+```powershell
+flutter pub get
+flutter run
+```
+
+## Generate documentation screenshots
+
+```powershell
+flutter test --update-goldens test/screenshots/golden_screens_test.dart
+```
+
+Outputs are written to `docs/screenshots/` and `docs/screenshots/individual/`.
+
+## License
+
+MIT (update if different)
