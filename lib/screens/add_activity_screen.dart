@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/activity_model.dart';
 import '../providers/app_providers.dart';
 import '../services/firebase_service.dart';
+import '../widgets/sheet_header.dart';
 
 class AddActivityScreen extends ConsumerStatefulWidget {
   final bool inSheet;
@@ -135,7 +136,7 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             if (widget.inSheet)
-              _SheetHeader(
+              SheetHeader(
                 title: 'Add Activity',
                 onClose: () => Navigator.of(context).maybePop(),
               ),
@@ -330,26 +331,3 @@ class _ContinuityChoice {
   _ContinuityChoice(this.moveNewStartIfPrev, this.moveNextStartIfNext);
 }
 
-class _SheetHeader extends StatelessWidget {
-  final String title;
-  final VoidCallback onClose;
-  const _SheetHeader({required this.title, required this.onClose});
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            title,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-          ),
-        ),
-        IconButton(
-          icon: const Icon(Icons.close),
-          tooltip: 'Close',
-          onPressed: onClose,
-        )
-      ],
-    );
-  }
-}

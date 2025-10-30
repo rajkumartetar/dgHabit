@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/activity_model.dart';
 import '../providers/app_providers.dart';
 import '../services/firebase_service.dart';
+import '../widgets/sheet_header.dart';
 
 class ActivityDetailScreen extends ConsumerStatefulWidget {
   final ActivityModel activity;
@@ -139,15 +140,21 @@ class _ActivityDetailScreenState extends ConsumerState<ActivityDetailScreen> {
         padding: const EdgeInsets.all(16),
         children: [
           if (widget.inSheet)
-            _SheetHeader(
+            SheetHeader(
               title: 'Activity Details',
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  tooltip: 'Delete',
+                  onPressed: () async {
+                    final nav = Navigator.of(context);
+                    await ref.read(firebaseServiceProvider).deleteActivity(a.activityId);
+                    nav.pop(true);
+                  },
+                ),
+                IconButton(icon: const Icon(Icons.save), tooltip: 'Save', onPressed: _save),
+              ],
               onClose: () => Navigator.of(context).maybePop(),
-              onSave: _save,
-              onDelete: () async {
-                final nav = Navigator.of(context);
-                await ref.read(firebaseServiceProvider).deleteActivity(a.activityId);
-                nav.pop(true);
-              },
             ),
           if (widget.inSheet) const SizedBox(height: 8),
           TextField(controller: _nameCtrl, decoration: const InputDecoration(labelText: 'Name')),
@@ -270,26 +277,4 @@ class _ContinuityChoice {
   _ContinuityChoice(this.moveNewStartIfPrev, this.moveNextStartIfNext);
 }
 
-class _SheetHeader extends StatelessWidget {
-  final String title;
-  final VoidCallback onClose;
-  final VoidCallback onSave;
-  final VoidCallback onDelete;
-  const _SheetHeader({required this.title, required this.onClose, required this.onSave, required this.onDelete});
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            title,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-          ),
-        ),
-        IconButton(icon: const Icon(Icons.delete_outline), tooltip: 'Delete', onPressed: onDelete),
-        IconButton(icon: const Icon(Icons.save), tooltip: 'Save', onPressed: onSave),
-        IconButton(icon: const Icon(Icons.close), tooltip: 'Close', onPressed: onClose),
-      ],
-    );
-  }
-}
+ 

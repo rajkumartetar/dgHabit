@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/app_providers.dart';
+import '../widgets/sheet_header.dart';
 
 class CategoryManagerScreen extends ConsumerStatefulWidget {
-  const CategoryManagerScreen({super.key});
+  final bool inSheet;
+  const CategoryManagerScreen({super.key, this.inSheet = false});
 
   @override
   ConsumerState<CategoryManagerScreen> createState() => _CategoryManagerScreenState();
@@ -30,18 +32,19 @@ class _CategoryManagerScreenState extends ConsumerState<CategoryManagerScreen> {
   @override
   Widget build(BuildContext context) {
     final service = ref.read(firebaseServiceProvider);
-    return Scaffold(
-      appBar: AppBar(title: const Text('Manage Categories')),
-      body: RefreshIndicator(
-        onRefresh: _refresh,
-        child: FutureBuilder<List<String>>(
-          future: service.getUserCategories(),
-          builder: (context, snap) {
-            final customs = (snap.data ?? const <String>[]).where((c) => !_defaults.contains(c)).toList()..sort();
-            return ListView(
-              padding: const EdgeInsets.all(12),
-              children: [
-                const ListTile(title: Text('Your categories'), dense: true),
+    final body = RefreshIndicator(
+      onRefresh: _refresh,
+      child: FutureBuilder<List<String>>(
+        future: service.getUserCategories(),
+        builder: (context, snap) {
+          final customs = (snap.data ?? const <String>[]).where((c) => !_defaults.contains(c)).toList()..sort();
+          return ListView(
+            padding: const EdgeInsets.all(12),
+            children: [
+              if (widget.inSheet)
+                SheetHeader(title: 'Manage Categories', onClose: () => Navigator.of(context).maybePop()),
+              if (widget.inSheet) const SizedBox(height: 8),
+              const ListTile(title: Text('Your categories'), dense: true),
                 if (customs.isEmpty)
                   const ListTile(title: Text('No custom categories yet.')), 
                 ...customs.map((c) => ListTile(
@@ -93,8 +96,8 @@ class _CategoryManagerScreenState extends ConsumerState<CategoryManagerScreen> {
                         ),
                       ]),
                     )),
-                const Divider(height: 24),
-                const ListTile(title: Text('Add new category'), dense: true),
+              const Divider(height: 24),
+              const ListTile(title: Text('Add new category'), dense: true),
                 Row(
                   children: [
                     Expanded(
@@ -122,11 +125,15 @@ class _CategoryManagerScreenState extends ConsumerState<CategoryManagerScreen> {
                     ),
                   ],
                 ),
-              ],
-            );
-          },
-        ),
+            ],
+          );
+        },
       ),
+    );
+    if (widget.inSheet) return body;
+    return Scaffold(
+      appBar: AppBar(title: const Text('Manage Categories')),
+      body: body,
     );
   }
 

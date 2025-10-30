@@ -6,6 +6,9 @@
 .metadata
 pubspec.lock
 
+# Ignore golden outputs generated under test folder
+test/screenshots/docs/
+
 # Build outputs
 build/
 ios/Pods/
