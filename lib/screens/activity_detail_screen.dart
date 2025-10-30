@@ -6,7 +6,8 @@ import '../services/firebase_service.dart';
 
 class ActivityDetailScreen extends ConsumerStatefulWidget {
   final ActivityModel activity;
-  const ActivityDetailScreen({super.key, required this.activity});
+  final bool inSheet;
+  const ActivityDetailScreen({super.key, required this.activity, this.inSheet = false});
 
   @override
   ConsumerState<ActivityDetailScreen> createState() => _ActivityDetailScreenState();
@@ -120,7 +121,7 @@ class _ActivityDetailScreenState extends ConsumerState<ActivityDetailScreen> {
   Widget build(BuildContext context) {
     final a = widget.activity;
     return Scaffold(
-      appBar: AppBar(
+      appBar: widget.inSheet ? null : AppBar(
         title: const Text('Activity Details'),
         actions: [
           IconButton(icon: const Icon(Icons.save), onPressed: _save),
@@ -137,6 +138,18 @@ class _ActivityDetailScreenState extends ConsumerState<ActivityDetailScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          if (widget.inSheet)
+            _SheetHeader(
+              title: 'Activity Details',
+              onClose: () => Navigator.of(context).maybePop(),
+              onSave: _save,
+              onDelete: () async {
+                final nav = Navigator.of(context);
+                await ref.read(firebaseServiceProvider).deleteActivity(a.activityId);
+                nav.pop(true);
+              },
+            ),
+          if (widget.inSheet) const SizedBox(height: 8),
           TextField(controller: _nameCtrl, decoration: const InputDecoration(labelText: 'Name')),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
@@ -255,4 +268,28 @@ class _ContinuityChoice {
   final bool moveNewStartIfPrev;
   final bool moveNextStartIfNext;
   _ContinuityChoice(this.moveNewStartIfPrev, this.moveNextStartIfNext);
+}
+
+class _SheetHeader extends StatelessWidget {
+  final String title;
+  final VoidCallback onClose;
+  final VoidCallback onSave;
+  final VoidCallback onDelete;
+  const _SheetHeader({required this.title, required this.onClose, required this.onSave, required this.onDelete});
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+        ),
+        IconButton(icon: const Icon(Icons.delete_outline), tooltip: 'Delete', onPressed: onDelete),
+        IconButton(icon: const Icon(Icons.save), tooltip: 'Save', onPressed: onSave),
+        IconButton(icon: const Icon(Icons.close), tooltip: 'Close', onPressed: onClose),
+      ],
+    );
+  }
 }

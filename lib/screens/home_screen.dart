@@ -111,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 isScrollControlled: true,
                 showDragHandle: true,
                 shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-                builder: (_) => const FractionallySizedBox(heightFactor: 0.94, child: AddActivityScreen()),
+                builder: (_) => const FractionallySizedBox(heightFactor: 0.94, child: AddActivityScreen(inSheet: true)),
               );
               if (added == true && mounted) {
                 setState(() {

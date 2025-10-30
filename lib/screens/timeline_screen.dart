@@ -85,8 +85,17 @@ class TimelineScreen extends ConsumerWidget {
           final a = list[i];
           return Dismissible(
             key: Key('activity_${a.activityId}'),
-            direction: DismissDirection.endToStart,
+            direction: DismissDirection.horizontal,
             background: Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.10),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Icon(Icons.edit_outlined, color: Colors.green),
+            ),
+            secondaryBackground: Container(
               alignment: Alignment.centerRight,
               padding: const EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
@@ -95,6 +104,22 @@ class TimelineScreen extends ConsumerWidget {
               ),
               child: const Icon(Icons.delete_outline, color: Colors.red),
             ),
+            confirmDismiss: (direction) async {
+              if (direction == DismissDirection.startToEnd) {
+                // Swipe right: edit in sheet
+                await showModalBottomSheet<bool>(
+                  context: c,
+                  useSafeArea: true,
+                  isScrollControlled: true,
+                  showDragHandle: true,
+                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+                  builder: (_) => FractionallySizedBox(heightFactor: 0.94, child: ActivityDetailScreen(activity: a, inSheet: true)),
+                );
+                return false; // do not dismiss
+              }
+              // Swipe left: delete
+              return true;
+            },
             onDismissed: (_) async {
               final deleted = a;
               await ref.read(firebaseServiceProvider).deleteActivity(deleted.activityId);
@@ -119,7 +144,7 @@ class TimelineScreen extends ConsumerWidget {
                   isScrollControlled: true,
                   showDragHandle: true,
                   shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-                  builder: (_) => FractionallySizedBox(heightFactor: 0.94, child: ActivityDetailScreen(activity: a)),
+                  builder: (_) => FractionallySizedBox(heightFactor: 0.94, child: ActivityDetailScreen(activity: a, inSheet: true)),
                 );
                 if (changed == true) {
                   // No-op; stream will update

@@ -6,7 +6,8 @@ import '../providers/app_providers.dart';
 import '../services/firebase_service.dart';
 
 class AddActivityScreen extends ConsumerStatefulWidget {
-  const AddActivityScreen({super.key});
+  final bool inSheet;
+  const AddActivityScreen({super.key, this.inSheet = false});
 
   @override
   ConsumerState<AddActivityScreen> createState() => _AddActivityScreenState();
@@ -127,14 +128,18 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Activity'),
-      ),
+      appBar: widget.inSheet ? null : AppBar(title: const Text('Add Activity')),
       body: Form(
         key: _formKey,
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            if (widget.inSheet)
+              _SheetHeader(
+                title: 'Add Activity',
+                onClose: () => Navigator.of(context).maybePop(),
+              ),
+            if (widget.inSheet) const SizedBox(height: 8),
             TextFormField(
               controller: _nameCtrl,
               decoration: const InputDecoration(labelText: 'Activity name'),
@@ -323,4 +328,28 @@ class _ContinuityChoice {
   final bool moveNewStartIfPrev;
   final bool moveNextStartIfNext;
   _ContinuityChoice(this.moveNewStartIfPrev, this.moveNextStartIfNext);
+}
+
+class _SheetHeader extends StatelessWidget {
+  final String title;
+  final VoidCallback onClose;
+  const _SheetHeader({required this.title, required this.onClose});
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.close),
+          tooltip: 'Close',
+          onPressed: onClose,
+        )
+      ],
+    );
+  }
 }
