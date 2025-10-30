@@ -44,6 +44,22 @@ flutter test --update-goldens test/screenshots/golden_screens_test.dart
 
 Outputs are written to `docs/screenshots/` and `docs/screenshots/individual/`.
 
+## Design System
+
+- **Colors**:
+  - AppBar background: 0xFF2DD4BF (mint green)
+  - AppBar foreground: White
+  - Schemes: Material 3 dynamic (light/dark)
+
+- **Typography**:
+  - Sheet headers: TitleMedium, fontWeight: w700
+  - Body text: Default Material 3
+
+- **Components**:
+  - Sheet headers: Padding 16h 4v, title + actions (close/save/delete)
+  - Buttons: FilledButton (primary), OutlinedButton (secondary)
+  - Lists: ListTile with dense/visualDensity compact
+
 ## License
 
 MIT (update if different)
