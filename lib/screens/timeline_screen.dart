@@ -81,23 +81,60 @@ class TimelineScreen extends ConsumerWidget {
           child: asyncActivities.when(
       data: (list) => ListView.separated(
         padding: const EdgeInsets.all(12),
-        itemBuilder: (c, i) => GestureDetector(
-          onTap: () async {
-            final changed = await Navigator.of(c).push<bool>(
-              MaterialPageRoute(builder: (_) => ActivityDetailScreen(activity: list[i])),
-            );
-            if (changed == true) {
-              // No-op; stream will update
-            }
-          },
-          child: Container(
-            decoration: decor == null ? null : BoxDecoration(gradient: decor.surfaceGradient, borderRadius: BorderRadius.circular(16)),
-            child: ActivityCard(
-              activity: list[i],
-              onDelete: () => ref.read(firebaseServiceProvider).deleteActivity(list[i].activityId),
+        itemBuilder: (c, i) {
+          final a = list[i];
+          return Dismissible(
+            key: Key('activity_${a.activityId}'),
+            direction: DismissDirection.endToStart,
+            background: Container(
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.10),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Icon(Icons.delete_outline, color: Colors.red),
             ),
-          ),
-        ),
+            onDismissed: (_) async {
+              final deleted = a;
+              await ref.read(firebaseServiceProvider).deleteActivity(deleted.activityId);
+              final messenger = ScaffoldMessenger.maybeOf(c);
+              messenger?.showSnackBar(
+                SnackBar(
+                  content: const Text('Activity deleted'),
+                  action: SnackBarAction(
+                    label: 'UNDO',
+                    onPressed: () {
+                      ref.read(firebaseServiceProvider).upsertActivity(deleted);
+                    },
+                  ),
+                ),
+              );
+            },
+            child: GestureDetector(
+              onTap: () async {
+                final changed = await showModalBottomSheet<bool>(
+                  context: c,
+                  useSafeArea: true,
+                  isScrollControlled: true,
+                  showDragHandle: true,
+                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+                  builder: (_) => FractionallySizedBox(heightFactor: 0.94, child: ActivityDetailScreen(activity: a)),
+                );
+                if (changed == true) {
+                  // No-op; stream will update
+                }
+              },
+              child: Container(
+                decoration: decor == null ? null : BoxDecoration(gradient: decor.surfaceGradient, borderRadius: BorderRadius.circular(16)),
+                child: ActivityCard(
+                  activity: a,
+                  onDelete: () => ref.read(firebaseServiceProvider).deleteActivity(a.activityId),
+                ),
+              ),
+            ),
+          );
+        },
   separatorBuilder: (context, index) => const SizedBox(height: 8),
         itemCount: list.length,
       ),

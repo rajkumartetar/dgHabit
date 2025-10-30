@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'permissions_screen.dart';
-import '../theme/app_decor.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -85,10 +84,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
     ];
 
     final scheme = Theme.of(context).colorScheme;
-    final decor = Theme.of(context).extension<AppDecor>();
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: decor == null ? null : Container(decoration: BoxDecoration(gradient: decor.headerGradient)),
         title: const Text('Welcome'),
         actions: [
           TextButton(
@@ -101,7 +98,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
           )
         ],
       ),
-      body: SafeArea(
+  body: SafeArea(
         child: Stack(
           children: [
             // Decorative blobs for a modern Gen Z feel (animated gently)

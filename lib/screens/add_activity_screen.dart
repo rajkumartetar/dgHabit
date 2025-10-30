@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/activity_model.dart';
 import '../providers/app_providers.dart';
 import '../services/firebase_service.dart';
-import '../theme/app_decor.dart';
 
 class AddActivityScreen extends ConsumerStatefulWidget {
   const AddActivityScreen({super.key});
@@ -127,10 +126,8 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final decor = Theme.of(context).extension<AppDecor>();
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: decor == null ? null : Container(decoration: BoxDecoration(gradient: decor.headerGradient)),
         title: const Text('Add Activity'),
       ),
       body: Form(

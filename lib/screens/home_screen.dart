@@ -11,7 +11,6 @@ import '../providers/app_providers.dart';
 import 'permissions_screen.dart';
 import 'settings_screen.dart';
 import '../models/activity_model.dart';
-import '../theme/app_decor.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -39,26 +38,36 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final decor = Theme.of(context).extension<AppDecor>();
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: decor == null
-            ? null
-            : Container(decoration: BoxDecoration(gradient: decor.headerGradient)),
         title: const Text('dgHabit'),
         actions: [
           IconButton(
             tooltip: 'Settings',
             icon: const Icon(Icons.settings_outlined),
             onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsScreen()));
+              showModalBottomSheet(
+                context: context,
+                useSafeArea: true,
+                isScrollControlled: true,
+                showDragHandle: true,
+                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+                builder: (_) => const FractionallySizedBox(heightFactor: 0.94, child: SettingsScreen()),
+              );
             },
           ),
           IconButton(
             tooltip: 'Permissions',
             icon: const Icon(Icons.privacy_tip_outlined),
             onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PermissionsScreen()));
+              showModalBottomSheet(
+                context: context,
+                useSafeArea: true,
+                isScrollControlled: true,
+                showDragHandle: true,
+                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+                builder: (_) => const FractionallySizedBox(heightFactor: 0.94, child: PermissionsScreen()),
+              );
             },
           ),
           IconButton(
@@ -96,9 +105,13 @@ class _HomeScreenState extends State<HomeScreen> {
           FloatingActionButton(
             heroTag: 'add_activity',
             onPressed: () async {
-              final added = await Navigator.push<bool>(
-                context,
-                MaterialPageRoute(builder: (context) => const AddActivityScreen()),
+              final added = await showModalBottomSheet<bool>(
+                context: context,
+                useSafeArea: true,
+                isScrollControlled: true,
+                showDragHandle: true,
+                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+                builder: (_) => const FractionallySizedBox(heightFactor: 0.94, child: AddActivityScreen()),
               );
               if (added == true && mounted) {
                 setState(() {

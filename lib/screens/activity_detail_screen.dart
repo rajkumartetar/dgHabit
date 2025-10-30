@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/activity_model.dart';
 import '../providers/app_providers.dart';
 import '../services/firebase_service.dart';
-import '../theme/app_decor.dart';
 
 class ActivityDetailScreen extends ConsumerStatefulWidget {
   final ActivityModel activity;
@@ -119,11 +118,9 @@ class _ActivityDetailScreenState extends ConsumerState<ActivityDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final decor = Theme.of(context).extension<AppDecor>();
     final a = widget.activity;
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: decor == null ? null : Container(decoration: BoxDecoration(gradient: decor.headerGradient)),
         title: const Text('Activity Details'),
         actions: [
           IconButton(icon: const Icon(Icons.save), onPressed: _save),

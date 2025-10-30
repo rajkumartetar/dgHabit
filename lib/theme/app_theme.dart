@@ -18,6 +18,7 @@ class AppTheme {
       titleMedium: GoogleFonts.capriola(textStyle: base.titleMedium),
       titleSmall: GoogleFonts.capriola(textStyle: base.titleSmall),
     );
+    const appBarBg = Color(0xFF2DD4BF); // Fixed brand mint for both themes
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
@@ -35,11 +36,13 @@ class AppTheme {
         },
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: scheme.surface,
-        foregroundColor: scheme.onSurface,
+        backgroundColor: appBarBg,
+        foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: false,
-        titleTextStyle: base.titleLarge?.copyWith(fontWeight: FontWeight.w600, color: scheme.onSurface),
+        titleTextStyle: base.titleLarge?.copyWith(fontWeight: FontWeight.w600, color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
+        actionsIconTheme: const IconThemeData(color: Colors.white),
       ),
       cardTheme: CardThemeData(
         color: scheme.surface,
@@ -97,6 +100,7 @@ class AppTheme {
       titleMedium: GoogleFonts.capriola(textStyle: base.titleMedium),
       titleSmall: GoogleFonts.capriola(textStyle: base.titleSmall),
     );
+    const appBarBg = Color(0xFF2DD4BF); // Same fixed color as light
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
@@ -114,11 +118,13 @@ class AppTheme {
         },
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: scheme.surface,
-        foregroundColor: scheme.onSurface,
+        backgroundColor: appBarBg,
+        foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: false,
-        titleTextStyle: base.titleLarge?.copyWith(fontWeight: FontWeight.w600, color: scheme.onSurface),
+        titleTextStyle: base.titleLarge?.copyWith(fontWeight: FontWeight.w600, color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
+        actionsIconTheme: const IconThemeData(color: Colors.white),
       ),
       cardTheme: CardThemeData(
         color: scheme.surface,
