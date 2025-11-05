@@ -48,8 +48,14 @@ dependencies:
 
   # Automatic Data Tracking
   pedometer: ^4.0.1 
-  usage_stats: ^1.1.0
+  # usage_stats plugin is temporarily replaced by a local stub to fix release build
+  # usage_stats: ^1.1.0
   permission_handler: ^11.3.1
+  flutter_local_notifications: ^17.2.3
+  image_picker: ^1.1.2
+  crop_your_image: ^2.0.0
+  firebase_storage: ^13.0.2
+  workmanager: ^0.9.0+3
 
   # Analytics & Charting
   syncfusion_flutter_charts: ^31.1.19
@@ -78,6 +84,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.13.1
   flutter_native_splash: ^2.4.1
+  golden_toolkit: ^0.15.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -140,16 +147,16 @@ flutter_icons:
 flutter_native_splash:
   color: "#FFF9C4"
   color_dark: "#1F1B16"
-  branding: "assets/brand/splash_1024.png"
-  branding_dark: "assets/brand/splash_1024.png"
-  branding_mode: bottom
-  branding_bottom_padding: 24
+  # Use the known-good launcher icon art as the center image
+  image: "assets/brand/icon_1024.png"
+  image_dark: "assets/brand/icon_1024.png"
+  # Remove branding to avoid a second small image at the bottom
   android_12:
     color: "#FFF9C4"
     color_dark: "#1F1B16"
     icon_background_color: "#FFF9C4"
     icon_background_color_dark: "#1F1B16"
-  image: "assets/brand/icon_1024.png"
-  image_dark: "assets/brand/icon_1024.png"
+    image: "assets/brand/icon_1024.png"
+    image_dark: "assets/brand/icon_1024.png"
   android: true
   ios: true

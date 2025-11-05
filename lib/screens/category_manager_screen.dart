@@ -16,7 +16,7 @@ class _CategoryManagerScreenState extends ConsumerState<CategoryManagerScreen> {
   bool _loading = false;
 
   final List<String> _defaults = const [
-    'Personal', 'Hygiene', 'Travel', 'Work', 'Fun', 'Productivity', 'Growth'
+    'Personal', 'Hygiene', 'Travel', 'Work', 'Fun', 'Productivity', 'Growth', 'Meals'
   ];
 
   Future<void> _refresh() async {

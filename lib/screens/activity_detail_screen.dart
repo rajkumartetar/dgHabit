@@ -1,9 +1,12 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import '../models/activity_model.dart';
 import '../providers/app_providers.dart';
 import '../services/firebase_service.dart';
 import '../widgets/sheet_header.dart';
+import '../widgets/meal_editor.dart';
 
 class ActivityDetailScreen extends ConsumerStatefulWidget {
   final ActivityModel activity;
@@ -21,7 +24,13 @@ class _ActivityDetailScreenState extends ConsumerState<ActivityDetailScreen> {
   late DateTime _start;
   late DateTime _end;
   static const List<String> _defaultCategories = ['Personal', 'Hygiene', 'Travel', 'Work', 'Fun', 'Productivity', 'Growth'];
-  List<String> _categories = [..._defaultCategories, 'Others'];
+  // Include 'Meals' in defaults
+  static const List<String> _mealAwareDefaults = ['Personal', 'Hygiene', 'Travel', 'Work', 'Fun', 'Productivity', 'Growth', 'Meals'];
+  List<String> _categories = [];
+  final TextEditingController _caloriesCtrl = TextEditingController();
+  final TextEditingController _healthScoreCtrl = TextEditingController();
+  Uint8List? _mealNewBytes;
+  bool _clearMealPhoto = false;
 
   @override
   void initState() {
@@ -30,12 +39,26 @@ class _ActivityDetailScreenState extends ConsumerState<ActivityDetailScreen> {
     _category = widget.activity.category;
     _start = widget.activity.startTime;
     _end = widget.activity.endTime;
+    // Ensure the dropdown items initially contain the current category
+    final baseSet = {
+      ..._defaultCategories,
+      // Include current category (e.g., 'Meals') to satisfy Dropdown invariant on first build
+      if (widget.activity.category.isNotEmpty) widget.activity.category,
+    };
+    final base = baseSet.toList()..sort();
+    _categories = [...base, 'Others'];
+    if (widget.activity.mealCalories != null) {
+      _caloriesCtrl.text = widget.activity.mealCalories!.toStringAsFixed(0);
+    }
+    if (widget.activity.mealHealthScore != null) {
+      _healthScoreCtrl.text = widget.activity.mealHealthScore!.toStringAsFixed(0);
+    }
     // Load user's custom categories and merge with defaults; ensure current value exists
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final customs = await ref.read(firebaseServiceProvider).getUserCategories();
       if (!mounted) return;
       final mergedSet = {
-        ..._defaultCategories,
+        ..._mealAwareDefaults,
         ...customs.where((c) => c.trim().isNotEmpty),
       };
       // Ensure current category is present to satisfy DropdownButton invariant
@@ -88,6 +111,29 @@ class _ActivityDetailScreenState extends ConsumerState<ActivityDetailScreen> {
       finalCategory = custom;
       await ref.read(firebaseServiceProvider).addUserCategory(finalCategory);
     }
+    String? photoUrl = widget.activity.mealPhotoUrl;
+    double? calories = _caloriesCtrl.text.trim().isNotEmpty ? double.tryParse(_caloriesCtrl.text.trim()) : widget.activity.mealCalories;
+    double? score = _healthScoreCtrl.text.trim().isNotEmpty ? double.tryParse(_healthScoreCtrl.text.trim()) : widget.activity.mealHealthScore;
+    // Upload or clear meal image if in Meals mode
+    if (_category == 'Meals' || widget.activity.mealPhotoUrl != null) {
+      final uid = ref.read(firebaseServiceProvider).uid;
+      final refSt = FirebaseStorage.instance.ref().child('users/$uid/meals/${widget.activity.activityId}.jpg');
+      try {
+        if (_clearMealPhoto) {
+          // Clear reference (best-effort delete)
+          photoUrl = null;
+          await refSt.delete().catchError((_){});
+        } else if (_mealNewBytes != null) {
+          await refSt.putData(_mealNewBytes!);
+          photoUrl = await refSt.getDownloadURL();
+        }
+      } catch (_) {}
+      // Simple heuristic if score missing but calories provided
+      if (score == null && calories != null) {
+        score = (100 - (calories / 10)).clamp(0, 100).toDouble();
+      }
+    }
+
     final updated = ActivityModel(
       activityId: widget.activity.activityId,
       activityName: _nameCtrl.text.trim(),
@@ -97,6 +143,9 @@ class _ActivityDetailScreenState extends ConsumerState<ActivityDetailScreen> {
       source: widget.activity.source,
       steps: widget.activity.steps,
       screenTimeMinutes: widget.activity.screenTimeMinutes,
+      mealPhotoUrl: photoUrl,
+      mealCalories: calories,
+      mealHealthScore: score,
     );
     // Use upsert for direct update; optionally, for start-time changes, we can re-run the continuous logic by reinserting.
     // For MVP, maintain continuity: delete and reinsert with continuous adjustment.
@@ -192,6 +241,17 @@ class _ActivityDetailScreenState extends ConsumerState<ActivityDetailScreen> {
           const SizedBox(height: 12),
           if (a.steps != null) Text('Steps: ${a.steps}'),
           if (a.screenTimeMinutes != null) Text('Screen time: ${a.screenTimeMinutes!.toStringAsFixed(1)} min'),
+          if ((_category == 'Meals') || a.mealPhotoUrl != null || a.mealCalories != null || a.mealHealthScore != null) ...[
+            const SizedBox(height: 12),
+            MealEditor(
+              existingUrl: a.mealPhotoUrl,
+              initialBytes: _mealNewBytes,
+              onBytesChanged: (bytes) => _mealNewBytes = bytes,
+              onRemoveChanged: (clear) => _clearMealPhoto = clear,
+              caloriesCtrl: _caloriesCtrl,
+              healthCtrl: _healthScoreCtrl,
+            ),
+          ],
         ],
       ),
     );
@@ -267,6 +327,8 @@ class _ActivityDetailScreenState extends ConsumerState<ActivityDetailScreen> {
   void dispose() {
     _customCatCtrl.dispose();
     _nameCtrl.dispose();
+    _caloriesCtrl.dispose();
+    _healthScoreCtrl.dispose();
     super.dispose();
   }
 }

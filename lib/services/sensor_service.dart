@@ -3,7 +3,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:pedometer/pedometer.dart';
-import 'package:usage_stats/usage_stats.dart';
+import 'package:dghabit/third_party/usage_stats.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -78,24 +78,32 @@ class SensorService {
     if (!Platform.isAndroid) return null;
     try {
       final pkg = (await PackageInfo.fromPlatform()).packageName;
+      // Prefer package usage stats for reliability
+      final stats = await UsageStats.queryUsageStats(start, end);
+      for (final s in stats) {
+        if (s.packageName == pkg) {
+          final ms = int.tryParse(s.totalTimeInForeground ?? '0') ?? 0;
+          if (ms > 0) return Duration(milliseconds: ms);
+          break;
+        }
+      }
+      // Fallback to event stream accumulation
       final events = await UsageStats.queryEvents(start, end);
-      // We consider ActivityResumed (MOVE_TO_FOREGROUND) to ActivityPaused (MOVE_TO_BACKGROUND)
       DateTime? inForegroundAt;
       int totalMs = 0;
       for (final ev in events) {
         if (ev.packageName != pkg) continue;
         final ts = DateTime.fromMillisecondsSinceEpoch(int.tryParse(ev.timeStamp ?? '0') ?? 0);
         final type = ev.eventType ?? '';
-        if (type == '1' /*MOVE_TO_FOREGROUND*/ || type.toLowerCase().contains('foreground')) {
+        if (type == '1' || type.toLowerCase().contains('foreground')) {
           inForegroundAt ??= ts;
-        } else if (type == '2' /*MOVE_TO_BACKGROUND*/ || type.toLowerCase().contains('background')) {
+        } else if (type == '2' || type.toLowerCase().contains('background')) {
           if (inForegroundAt != null) {
             totalMs += ts.difference(inForegroundAt).inMilliseconds;
             inForegroundAt = null;
           }
         }
       }
-      // If still in foreground at end
       if (inForegroundAt != null) {
         totalMs += end.difference(inForegroundAt).inMilliseconds;
       }

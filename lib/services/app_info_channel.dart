@@ -6,7 +6,8 @@ class AppInfoItem {
   final String package;
   final String name;
   final Uint8List? icon;
-  AppInfoItem({required this.package, required this.name, this.icon});
+  final bool isSystem;
+  AppInfoItem({required this.package, required this.name, this.icon, this.isSystem = false});
 }
 
 class AppInfoChannel {
@@ -29,6 +30,7 @@ class AppInfoChannel {
               package: pkg,
               name: (map['name'] as String?) ?? pkg,
               icon: map['icon'] as Uint8List?,
+              isSystem: (map['system'] as bool?) ?? false,
             );
             _cache[pkg] = item;
           });

@@ -12,6 +12,10 @@ class ActivityModel {
   final ActivitySource source;
   final int? steps;
   final double? screenTimeMinutes; // optional
+  // Meals-specific (optional)
+  final String? mealPhotoUrl; // Firebase Storage URL
+  final double? mealCalories; // kcal estimate
+  final double? mealHealthScore; // 0-100 heuristic
 
   ActivityModel({
     required this.activityId,
@@ -22,6 +26,9 @@ class ActivityModel {
     required this.source,
     this.steps,
     this.screenTimeMinutes,
+    this.mealPhotoUrl,
+    this.mealCalories,
+    this.mealHealthScore,
   });
 
   Duration get duration => endTime.difference(startTime);
@@ -35,6 +42,9 @@ class ActivityModel {
         'source': source.name,
         'steps': steps,
         'screen_time': screenTimeMinutes,
+    'meal_photo_url': mealPhotoUrl,
+    'meal_calories': mealCalories,
+    'meal_health_score': mealHealthScore,
       };
 
   factory ActivityModel.fromDoc(DocumentSnapshot doc) {
@@ -50,6 +60,13 @@ class ActivityModel {
       screenTimeMinutes: (data['screen_time'] is int)
           ? (data['screen_time'] as int).toDouble()
           : data['screen_time'],
+      mealPhotoUrl: data['meal_photo_url'],
+      mealCalories: (data['meal_calories'] is int)
+          ? (data['meal_calories'] as int).toDouble()
+          : data['meal_calories'],
+      mealHealthScore: (data['meal_health_score'] is int)
+          ? (data['meal_health_score'] as int).toDouble()
+          : data['meal_health_score'],
     );
   }
 }

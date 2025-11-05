@@ -8,7 +8,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:fl_chart/fl_chart.dart' as fl;
 import '../theme/category_colors.dart';
 import '../theme/app_decor.dart';
-import 'package:usage_stats/usage_stats.dart' as us;
+import 'package:dghabit/third_party/usage_stats.dart' as us;
 import '../services/app_info_channel.dart';
 
 final weeklyAnalyticsProvider = StreamProvider<WeeklyAnalytics>((ref) {
@@ -88,13 +88,39 @@ class AnalyticsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        children: [
+          const TabBar(
+            tabs: [
+              Tab(text: 'Today analytics'),
+              Tab(text: 'Weekly overview'),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                _TodayAnalytics(),
+                _WeeklyOverview(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WeeklyOverview extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     final asyncData = ref.watch(weeklyAnalyticsProvider);
     final decor = Theme.of(context).extension<AppDecor>();
     return asyncData.when(
       data: (data) {
         final totalH = data.totalDuration.inHours;
         final totalM = data.totalDuration.inMinutes % 60;
-        final todayCats = ref.watch(todayCategoryProvider);
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
@@ -105,9 +131,9 @@ class AnalyticsScreen extends ConsumerWidget {
               child: Container(
                 decoration: decor == null ? null : BoxDecoration(gradient: decor.surfaceGradient),
                 child: ListTile(
-                leading: const Icon(Icons.timer),
-                title: Text('Total time: ${totalH}h ${totalM.toString().padLeft(2, '0')}m'),
-                subtitle: Text('Steps: ${data.totalSteps} • Screen: ${data.totalScreenMinutes.toStringAsFixed(1)} min'),
+                  leading: const Icon(Icons.timer),
+                  title: Text('Total time: ${totalH}h ${totalM.toString().padLeft(2, '0')}m'),
+                  subtitle: Text('Steps: ${data.totalSteps} • Screen: ${data.totalScreenMinutes.toStringAsFixed(1)} min'),
                 ),
               ),
             ),
@@ -211,127 +237,139 @@ class AnalyticsScreen extends ConsumerWidget {
                 ),
               );
             }),
-            const SizedBox(height: 8),
-            Text('Today by category', style: Theme.of(context).textTheme.titleMedium),
-            todayCats.when(
-              data: (catMap) {
-                final entries = catMap.entries.where((e) => e.value > Duration.zero).toList()
-                  ..sort((a, b) => b.value.compareTo(a.value));
-                final totalMin = entries.fold<double>(0, (s, e) => s + e.value.inMinutes.toDouble());
-                if (entries.isEmpty || totalMin <= 0) {
-                  return const ListTile(title: Text('No data for today'));
-                }
-                return Column(
-                  children: [
-                    SizedBox(
-                      height: 220,
-                      child: fl.PieChart(
-                        fl.PieChartData(
-                          sectionsSpace: 2,
-                          centerSpaceRadius: 40,
-                          sections: entries
-                              .map(
-                                (e) => fl.PieChartSectionData(
-                                  color: categoryColor(context, e.key),
-                                  value: e.value.inMinutes.toDouble(),
-                                  title: _pct(e.value.inMinutes.toDouble(), totalMin),
-                                  radius: 70,
-                                ),
-                              )
-                              .toList(),
-                          pieTouchData: fl.PieTouchData(
-                            touchCallback: (fl.FlTouchEvent event, fl.PieTouchResponse? response) {
-                              final touched = response?.touchedSection;
-                              if (touched == null) return;
-                              final idx = touched.touchedSectionIndex;
-                              if (idx < 0 || idx >= entries.length) return;
-                              final e = entries[idx];
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('${e.key}: ${_pct(e.value.inMinutes.toDouble(), totalMin)}')),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                    ...entries.map((e) => ListTile(
-                          leading: const Icon(Icons.label_outline),
-                          title: Text(e.key),
-                          trailing: Text('${e.value.inHours}h ${(e.value.inMinutes % 60).toString().padLeft(2, '0')}m'),
-                        )),
-                  ],
-                );
-              },
-              loading: () => const Padding(padding: EdgeInsets.all(8), child: LinearProgressIndicator()),
-              error: (e, st) => ListTile(title: Text('Error: $e')),
-            ),
-            const SizedBox(height: 8),
-            Text('Top apps screen time (today)', style: Theme.of(context).textTheme.titleMedium),
-            Consumer(builder: (context, ref, _) {
-              if (!Platform.isAndroid) {
-                return const ListTile(title: Text('App usage not available on this platform'));
-              }
-              final now = DateTime.now();
-              final start = DateTime(now.year, now.month, now.day);
-              final sensor = ref.read(sensorServiceProvider);
-              return FutureBuilder<Map<String, Duration>?>(
-                future: sensor.getPerAppScreenTimeMap(start, now),
-                builder: (context, snap) {
-                  if (snap.connectionState != ConnectionState.done) {
-                    return const Padding(padding: EdgeInsets.all(8), child: LinearProgressIndicator());
-                  }
-                  final map = snap.data;
-                  if (map == null || map.isEmpty) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const ListTile(title: Text('No app usage data (grant Usage Access)')),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: OutlinedButton.icon(
-                            icon: const Icon(Icons.settings),
-                            label: const Text('Open Usage Access settings'),
-                            onPressed: () => us.UsageStats.grantUsagePermission(),
-                          ),
-                        ),
-                      ],
-                    );
-                  }
-                  final top = map.entries.where((e) => !_isThisApp(e.key)).toList()
-                    ..sort((a, b) => b.value.compareTo(a.value));
-                  final top5 = top.take(5).toList();
-                  final channel = AppInfoChannel();
-                  return FutureBuilder<Map<String, AppInfoItem>>(
-                    future: channel.fetchMany(top5.map((e) => e.key)),
-                    builder: (context, infoSnap) {
-                      final info = infoSnap.data;
-                      return Card(
-                        child: Column(
-                          children: top5.map((e) {
-                            final item = info?[e.key];
-                            final leading = (item?.icon != null)
-                                ? CircleAvatar(backgroundImage: MemoryImage(item!.icon!))
-                                : const Icon(Icons.apps);
-                            var title = item?.name ?? _friendlyAppName(e.key);
-                            if (title == e.key) title = 'Unknown app';
-                            return ListTile(
-                              leading: leading,
-                              title: Text(title),
-                              trailing: Text(_fmtHm(e.value)),
-                            );
-                          }).toList(),
-                        ),
-                      );
-                    },
-                  );
-                },
-              );
-            }),
           ],
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, st) => Center(child: Text('Error: $e')),
+    );
+  }
+}
+
+class _TodayAnalytics extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final todayCats = ref.watch(todayCategoryProvider);
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Text('Today by category', style: Theme.of(context).textTheme.titleLarge),
+        const SizedBox(height: 8),
+        todayCats.when(
+          data: (catMap) {
+            final entries = catMap.entries.where((e) => e.value > Duration.zero).toList()
+              ..sort((a, b) => b.value.compareTo(a.value));
+            final totalMin = entries.fold<double>(0, (s, e) => s + e.value.inMinutes.toDouble());
+            if (entries.isEmpty || totalMin <= 0) {
+              return const ListTile(title: Text('No data for today'));
+            }
+            return Column(
+              children: [
+                SizedBox(
+                  height: 220,
+                  child: fl.PieChart(
+                    fl.PieChartData(
+                      sectionsSpace: 2,
+                      centerSpaceRadius: 40,
+                      sections: entries
+                          .map(
+                            (e) => fl.PieChartSectionData(
+                              color: categoryColor(context, e.key),
+                              value: e.value.inMinutes.toDouble(),
+                              title: _pct(e.value.inMinutes.toDouble(), totalMin),
+                              radius: 70,
+                            ),
+                          )
+                          .toList(),
+                      pieTouchData: fl.PieTouchData(
+                        touchCallback: (fl.FlTouchEvent event, fl.PieTouchResponse? response) {
+                          final touched = response?.touchedSection;
+                          if (touched == null) return;
+                          final idx = touched.touchedSectionIndex;
+                          if (idx < 0 || idx >= entries.length) return;
+                          final e = entries[idx];
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('${e.key}: ${_pct(e.value.inMinutes.toDouble(), totalMin)}')),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                ...entries.map((e) => ListTile(
+                      leading: const Icon(Icons.label_outline),
+                      title: Text(e.key),
+                      trailing: Text('${e.value.inHours}h ${(e.value.inMinutes % 60).toString().padLeft(2, '0')}m'),
+                    )),
+              ],
+            );
+          },
+          loading: () => const Padding(padding: EdgeInsets.all(8), child: LinearProgressIndicator()),
+          error: (e, st) => ListTile(title: Text('Error: $e')),
+        ),
+        const SizedBox(height: 8),
+        Text('Top apps screen time (today)', style: Theme.of(context).textTheme.titleMedium),
+        Consumer(builder: (context, ref, _) {
+          if (!Platform.isAndroid) {
+            return const ListTile(title: Text('App usage not available on this platform'));
+          }
+          final now = DateTime.now();
+          final start = DateTime(now.year, now.month, now.day);
+          final sensor = ref.read(sensorServiceProvider);
+          return FutureBuilder<Map<String, Duration>?>(
+            future: sensor.getPerAppScreenTimeMap(start, now),
+            builder: (context, snap) {
+              if (snap.connectionState != ConnectionState.done) {
+                return const Padding(padding: EdgeInsets.all(8), child: LinearProgressIndicator());
+              }
+              final map = snap.data;
+              if (map == null || map.isEmpty) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const ListTile(title: Text('No app usage data (grant Usage Access)')),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.settings),
+                        label: const Text('Open Usage Access settings'),
+                        onPressed: () => us.UsageStats.grantUsagePermission(),
+                      ),
+                    ),
+                  ],
+                );
+              }
+              final top = map.entries.where((e) => !_isThisApp(e.key)).toList()
+                ..sort((a, b) => b.value.compareTo(a.value));
+              final top5 = top.take(5).toList();
+              final channel = AppInfoChannel();
+              return FutureBuilder<Map<String, AppInfoItem>>(
+                future: channel.fetchMany(top5.map((e) => e.key)),
+                builder: (context, infoSnap) {
+                  final info = infoSnap.data;
+                  return Card(
+                    child: Column(
+                      children: top5.map((e) {
+                        final item = info?[e.key];
+                        final leading = (item?.icon != null)
+                            ? CircleAvatar(backgroundImage: MemoryImage(item!.icon!))
+                            : const Icon(Icons.apps);
+                        var title = item?.name ?? _friendlyAppName(e.key);
+                        if (title == e.key) title = 'Unknown app';
+                        return ListTile(
+                          leading: leading,
+                          title: Text(title),
+                          trailing: Text(_fmtHm(e.value)),
+                        );
+                      }).toList(),
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        }),
+      ],
     );
   }
 }

@@ -1,6 +1,10 @@
 // lib/screens/add_activity_screen.dart
 import 'package:flutter/material.dart';
+import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import '../models/activity_model.dart';
 import '../providers/app_providers.dart';
 import '../services/firebase_service.dart';
@@ -8,7 +12,9 @@ import '../widgets/sheet_header.dart';
 
 class AddActivityScreen extends ConsumerStatefulWidget {
   final bool inSheet;
-  const AddActivityScreen({super.key, this.inSheet = false});
+  // For golden tests: provide a fixed start time to avoid non-determinism.
+  final DateTime? debugStartTime;
+  const AddActivityScreen({super.key, this.inSheet = false, this.debugStartTime});
 
   @override
   ConsumerState<AddActivityScreen> createState() => _AddActivityScreenState();
@@ -18,18 +24,26 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _customCatCtrl = TextEditingController();
+  final _caloriesCtrl = TextEditingController();
+  final _healthScoreCtrl = TextEditingController();
   String _category = 'Personal';
   DateTime _start = DateTime.now();
   DateTime? _end;
   ActivitySource _source = ActivitySource.manual;
   static const List<String> _defaultCategories = [
-    'Personal', 'Hygiene', 'Travel', 'Work', 'Fun', 'Productivity', 'Growth'
+    'Personal', 'Hygiene', 'Travel', 'Work', 'Fun', 'Productivity', 'Growth', 'Meals'
   ];
   List<String> _categories = [..._defaultCategories, 'Others'];
+  XFile? _mealImage;
+  Uint8List? _mealPreviewBytes;
+  bool _uploading = false;
 
   @override
   void initState() {
     super.initState();
+    if (widget.debugStartTime != null) {
+      _start = widget.debugStartTime!;
+    }
     // Default start time is current time
     // Load user's custom categories and merge
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -97,6 +111,38 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
     final finalEnd = effectiveEnd.isAfter(endToday) ? endToday : effectiveEnd;
   // Simple unique id based on timestamp; Firestore doc id could also be generated
   final id = DateTime.now().millisecondsSinceEpoch.toString();
+    String? photoUrl;
+    double? calories;
+    double? score;
+    if (finalCategory == 'Meals') {
+      // Best-effort upload to Firebase Storage if an image is selected
+      if (_mealImage != null) {
+        try {
+          setState(() => _uploading = true);
+          final uid = ref.read(firebaseServiceProvider).uid;
+          final refSt = FirebaseStorage.instance.ref().child('users/$uid/meals/$id.jpg');
+          final bytes = await _mealImage!.readAsBytes();
+          await refSt.putData(bytes);
+          photoUrl = await refSt.getDownloadURL();
+        } catch (_) {
+          // Non-fatal: proceed without image
+        } finally {
+          if (mounted) setState(() => _uploading = false);
+        }
+      }
+      if (_caloriesCtrl.text.trim().isNotEmpty) {
+        calories = double.tryParse(_caloriesCtrl.text.trim());
+      }
+      if (_healthScoreCtrl.text.trim().isNotEmpty) {
+        score = double.tryParse(_healthScoreCtrl.text.trim());
+      }
+      // Simple heuristic if score missing but calories provided
+      if (score == null && calories != null) {
+        // 100 - (cal/10), clamped 0..100
+        score = (100 - (calories / 10)).clamp(0, 100).toDouble();
+      }
+    }
+
     final activity = ActivityModel(
       activityId: id,
       activityName: _nameCtrl.text.trim(),
@@ -104,6 +150,9 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
       endTime: finalEnd,
       category: finalCategory,
       source: _source,
+      mealPhotoUrl: photoUrl,
+      mealCalories: calories,
+      mealHealthScore: score,
     );
     final service = ref.read(firebaseServiceProvider);
     if (_end == null) {
@@ -174,6 +223,97 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
                 textCapitalization: TextCapitalization.words,
               ),
             ],
+            if (_category == 'Meals') ...[
+              const SizedBox(height: 12),
+              const Text('Meal details', style: TextStyle(fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      color: Colors.black12,
+                      width: 72,
+                      height: 72,
+                      child: _mealPreviewBytes != null
+                          ? Image.memory(
+                              _mealPreviewBytes!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Icon(Icons.image_not_supported),
+                            )
+                          : const Icon(Icons.restaurant_outlined, size: 28),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed: () async {
+                            final picker = ImagePicker();
+                            final img = await picker.pickImage(source: ImageSource.gallery, maxWidth: 1440, imageQuality: 85);
+                            if (img != null) {
+                              final bytes = await img.readAsBytes();
+                              setState(() {
+                                _mealImage = img;
+                                _mealPreviewBytes = bytes;
+                              });
+                            }
+                          },
+                          icon: const Icon(Icons.photo_library_outlined),
+                          label: const Text('Pick photo'),
+                        ),
+                        OutlinedButton.icon(
+                          onPressed: () async {
+                            // Request camera permission first (Android/iOS)
+                            final status = await Permission.camera.request();
+                            if (!mounted) return;
+                            if (status.isDenied || status.isPermanentlyDenied || status.isRestricted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Camera permission is required to take a photo.')),
+                              );
+                              return;
+                            }
+                            final picker = ImagePicker();
+                            final img = await picker.pickImage(source: ImageSource.camera, maxWidth: 1440, imageQuality: 85);
+                            if (img != null) {
+                              final bytes = await img.readAsBytes();
+                              if (!mounted) return;
+                              setState(() {
+                                _mealImage = img;
+                                _mealPreviewBytes = bytes;
+                              });
+                            }
+                          },
+                          icon: const Icon(Icons.photo_camera_outlined),
+                          label: const Text('Camera'),
+                        ),
+                        if (_mealImage != null)
+                          TextButton.icon(
+                            onPressed: () => setState(() { _mealImage = null; _mealPreviewBytes = null; }),
+                            icon: const Icon(Icons.close),
+                            label: const Text('Remove'),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _caloriesCtrl,
+                decoration: const InputDecoration(labelText: 'Calories (kcal, optional)'),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _healthScoreCtrl,
+                decoration: const InputDecoration(labelText: 'Health score 0-100 (optional)'),
+                keyboardType: TextInputType.number,
+              ),
+            ],
             const SizedBox(height: 12),
             ListTile(
               title: const Text('Start time'),
@@ -213,7 +353,13 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
             Row(
               children: [
                 Expanded(
-                  child: FilledButton.icon(onPressed: _save, icon: const Icon(Icons.save), label: const Text('Save')),
+                  child: FilledButton.icon(
+                    onPressed: _uploading ? null : _save,
+                    icon: _uploading
+                        ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                        : const Icon(Icons.save),
+                    label: const Text('Save'),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -255,6 +401,8 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
   void dispose() {
     _nameCtrl.dispose();
     _customCatCtrl.dispose();
+    _caloriesCtrl.dispose();
+    _healthScoreCtrl.dispose();
     super.dispose();
   }
 

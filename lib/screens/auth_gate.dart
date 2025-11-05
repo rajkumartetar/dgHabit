@@ -34,35 +34,6 @@ class AuthGate extends StatelessWidget {
                 ),
               );
             },
-            footerBuilder: (context, action) {
-              return Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Align(
-                  alignment: Alignment.center,
-                  child: TextButton.icon(
-                    onPressed: () async {
-                      try {
-                        await FirebaseAuth.instance.signInAnonymously();
-                      } on FirebaseAuthException catch (e) {
-                        String msg = 'Anonymous sign-in failed: ${e.code}';
-                        if (e.code == 'operation-not-allowed') {
-                          msg = 'Anonymous sign-in is disabled in Firebase. Enable it in Firebase Console > Authentication > Sign-in method.';
-                        }
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-                        }
-                      } catch (e) {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Anonymous sign-in failed: $e')));
-                        }
-                      }
-                    },
-                    icon: const Icon(Icons.person_outline),
-                    label: const Text('Continue without account (dev)')
-                  ),
-                ),
-              );
-            },
           );
         }
         // User is signed in, show home screen

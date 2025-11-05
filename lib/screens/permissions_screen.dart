@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:usage_stats/usage_stats.dart' as us;
+import 'package:dghabit/third_party/usage_stats.dart' as us;
 import '../widgets/sheet_header.dart';
 
 class PermissionsScreen extends StatefulWidget {
@@ -15,6 +15,7 @@ class PermissionsScreen extends StatefulWidget {
 class _PermissionsScreenState extends State<PermissionsScreen> {
   bool? activityGranted;
   bool? usageGranted;
+  bool? cameraGranted;
 
   @override
   void initState() {
@@ -27,14 +28,17 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
       setState(() {
         activityGranted = true;
         usageGranted = true;
+        cameraGranted = true;
       });
       return;
     }
     final act = await Permission.activityRecognition.status;
     final usage = await us.UsageStats.checkUsagePermission();
+    final cam = await Permission.camera.status;
     setState(() {
       activityGranted = act.isGranted;
       usageGranted = usage;
+      cameraGranted = cam.isGranted;
     });
   }
 
@@ -42,6 +46,12 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
     if (!Platform.isAndroid) return;
     final res = await Permission.activityRecognition.request();
     setState(() => activityGranted = res.isGranted);
+  }
+
+  Future<void> _requestCamera() async {
+    if (!Platform.isAndroid) return;
+    final res = await Permission.camera.request();
+    setState(() => cameraGranted = res.isGranted);
   }
 
   Future<void> _openUsageAccessSettings() async {
@@ -60,6 +70,17 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
         children: [
           if (widget.inSheet) SheetHeader(title: 'Permissions', onClose: () => Navigator.of(context).maybePop()),
           if (widget.inSheet) const SizedBox(height: 8),
+          // Camera first
+          ListTile(
+            leading: Icon(cameraGranted == true ? Icons.check_circle : Icons.error, color: cameraGranted == true ? Colors.green : Colors.orange),
+            title: const Text('Camera (meal photos)'),
+            subtitle: const Text('Allow to capture photos for meals'),
+            trailing: ElevatedButton(
+              onPressed: cameraGranted == true ? null : _requestCamera,
+              child: Text(cameraGranted == true ? 'Granted' : 'Grant'),
+            ),
+          ),
+          const SizedBox(height: 8),
           ListTile(
             leading: Icon(activityGranted == true ? Icons.check_circle : Icons.error, color: activityGranted == true ? Colors.green : Colors.orange),
             title: const Text('Physical Activity (steps)'),

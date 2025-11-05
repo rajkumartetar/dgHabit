@@ -8,12 +8,17 @@ import 'screens/splash_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'theme/app_theme.dart';
 import 'providers/app_providers.dart';
+import 'services/background_tasks.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // Initialize background task scheduler (Android) and schedule from saved prefs
+  // Initialize background worker on Android and schedule from saved prefs
+  await initWorkmanager();
+  await ensureScheduledFromPrefs();
   runApp(const ProviderScope(child: DgHabitApp()));
 }
 
@@ -25,6 +30,7 @@ class DgHabitApp extends ConsumerWidget {
     final mode = ref.watch(themeModeProvider);
     return MaterialApp(
       title: 'dgHabit',
+      debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: mode,

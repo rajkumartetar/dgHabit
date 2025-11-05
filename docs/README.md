@@ -2,6 +2,8 @@
 
 This document outlines the current dgHabit product, architecture, and UI walkthrough using up-to-date screenshots from `docs/screenshots/individual/`.
 
+Note: Screenshots refreshed on 2025-11-05 to reflect the latest UI (Camera permission first; Quick Actions simplified).
+
 ## 1. Overview
 - App name: dgHabit
 - One-liner: Build habits, day by day — log activities, visualize trends, and grow.
@@ -21,8 +23,10 @@ This document outlines the current dgHabit product, architecture, and UI walkthr
 - Add/edit activities with default and custom categories; quick-start flow.
 - Analytics: weekly trends, category breakdowns, and top insights.
 - Settings: theme mode, category management; Permissions: activity/usage access.
-- Quick Actions sheet: screen time capture, show today steps, start/stop steps session.
+- Quick Actions sheet: only "Show today's steps" with a physical activity icon.
 - Firebase-backed: Auth + Firestore for persistence (mocked in tests for screenshots).
+- Meals: track meals as activities with optional photo upload (stored in Firebase Storage), calories, and a simple health score.
+- Notifications: local reminders plus background per-app screen time limit alerts (Android).
 
 ## 4. App Walkthrough
 Screenshots are generated automatically via golden tests. See section 9.
@@ -94,6 +98,9 @@ ActivityModel
 - source: enum(manual|auto)
 - steps?: int
 - screenTimeMinutes?: double
+ - mealPhotoUrl?: string
+ - mealCalories?: double
+ - mealHealthScore?: double
 ```
 
 ## 6. Architecture
@@ -106,6 +113,7 @@ ActivityModel
 - Android permissions:
   - Physical Activity (Activity Recognition) to read steps sensors.
   - Usage Access to read screen time per app; the app guides users to grant this.
+  - Notifications (Android 13+): POST_NOTIFICATIONS to show local reminders.
 
 ## 8. How to Run
 - Prereqs: Flutter SDK, Firebase project configured (google-services.json/GoogleService-Info.plist).
@@ -123,6 +131,8 @@ ActivityModel
 - Tablet/desktop layout polish
 - More automation sources (calendar, location)
 - Reminders & streaks
+- Background screen time limit checks (scheduled/foreground service)
+- iOS notification parity and camera capture for Meals
 
 ## 11. Credits & License
 - Icons/illustrations: in `assets/brand/`

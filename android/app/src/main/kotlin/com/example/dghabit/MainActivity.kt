@@ -4,9 +4,12 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.content.pm.ApplicationInfo
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import android.content.Intent
+import android.provider.Settings
 import java.io.ByteArrayOutputStream
 
 class MainActivity : FlutterActivity() {
@@ -24,19 +27,39 @@ class MainActivity : FlutterActivity() {
 							val appInfo = pm.getApplicationInfo(pkg, 0)
 							val label = pm.getApplicationLabel(appInfo).toString()
 							val iconDrawable = pm.getApplicationIcon(pkg)
+							val isSystem = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0 || (appInfo.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
 							val iconBytes = drawableToBytes(iconDrawable)
 							out[pkg] = mapOf(
 								"name" to label,
-								"icon" to iconBytes
+								"icon" to iconBytes,
+								"system" to isSystem
 							)
 						} catch (e: Exception) {
 							out[pkg] = mapOf(
 								"name" to pkg,
-								"icon" to null
+								"icon" to null,
+								"system" to false
 							)
 						}
 					}
 					result.success(out)
+				}
+				else -> result.notImplemented()
+			}
+		}
+
+		// System settings channel
+		MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.example.dghabit/system").setMethodCallHandler { call, result ->
+			when (call.method) {
+				"openUsageAccessSettings" -> {
+					try {
+						val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+						intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+						startActivity(intent)
+						result.success(true)
+					} catch (e: Exception) {
+						result.error("ERROR", e.message, null)
+					}
 				}
 				else -> result.notImplemented()
 			}

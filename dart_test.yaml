@@ -1,0 +1,10 @@
+# Configure test tags used in this repository.
+# This silences warnings like:
+# "A tag was used that wasn't specified in dart_test.yaml. golden was used..."
+
+tags:
+  golden:
+    enabled: true
+  # You can add more tags here if needed in the future, e.g.:
+  # slow:
+  #   enabled: true

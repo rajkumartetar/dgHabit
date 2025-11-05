@@ -3,6 +3,10 @@
     <!-- Sensors & usage stats permissions for pedometer and screen time -->
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
+    <!-- Notifications (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Camera for meal photos -->
+    <uses-permission android:name="android.permission.CAMERA" />
     <application
         android:label="dghabit"
         android:name="${applicationName}"

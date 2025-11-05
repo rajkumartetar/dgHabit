@@ -8,6 +8,8 @@ Build habits, day by day — log activities, visualize trends, and grow.
 - Daily timeline with continuity handling (no-gap/overlap strategies)
 - Bottom-sheet UI for Add/Edit Activity, Settings, Permissions, and Category Manager
 - Analytics with weekly trends and category breakdowns
+- New: Meals category with photo upload and nutrition fields (calories, health score)
+- New: Local notifications for inactivity reminders and screen time checks
 
 ## Screenshots
 

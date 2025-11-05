@@ -10,13 +10,17 @@ plugins {
 
 android {
     namespace = "com.example.dghabit"
-    compileSdk = flutter.compileSdkVersion
+    // Explicitly set compileSdk to the highest required by plugins
+    compileSdk = 35
+    // Pin build tools to ensure aapt2 supports modern attributes like android:attr/lStar
+    buildToolsVersion = "35.0.0"
     // Use the highest Android NDK version required by plugins to avoid warnings
     ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -30,7 +34,8 @@ android {
         // For more information, see: https://flutter.dev/to/review-gradle-config.
     // firebase_auth requires minSdkVersion 23 or higher
     minSdk = if (flutter.minSdkVersion < 23) 23 else flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+    // Align targetSdk with compileSdk for modern dependencies
+    targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
@@ -46,4 +51,8 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }
