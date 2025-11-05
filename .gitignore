@@ -10,6 +10,10 @@ pubspec.lock
 test/screenshots/docs/
 
 # Build outputs
+# Do not commit exported documentation artifacts
+docs/**/*.docx
+docs/**/*.pdf
+docs/**/*.rtf
 build/
 ios/Pods/
 android/.gradle/
