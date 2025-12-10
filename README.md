@@ -39,25 +39,26 @@ Composite (all screens):
 
 Key individual screens (under `docs/screenshots/individual/`):
 
-- **Splash / Dashboard**
-  - ![Splash → Dashboard](docs/screenshots/individual/SplashScreen_Dashboarding1.jpg)
-- **Authentication**
-  - ![Login](docs/screenshots/individual/LoginScreen.jpg)
-  - ![Register](docs/screenshots/individual/RegisterScreen.jpg)
-- **Home / Timeline / Overview**
-  - ![Home / Today](docs/screenshots/individual/DailyTimelineScreen.jpg)
-  - ![Today Analytics](docs/screenshots/individual/TodaysAnalyticsScreen.jpg)
-  - ![Weekly Overview](docs/screenshots/individual/WeeklyOverviewScreen.jpg)
-  - ![Dashboard Analytics](docs/screenshots/individual/DashboardingScreen2_3.jpg)
-- **Activities & Details**
-  - ![Add Activity](docs/screenshots/individual/AddActivity.jpg)
-  - ![Activity Details & Edit](docs/screenshots/individual/ActitivtyDetails_Edit.jpg)
-  - ![Steps Count Feature](docs/screenshots/individual/StepsCountFeature.jpg)
-- **Categories & Settings**
-  - ![Categories in Add Activity](docs/screenshots/individual/Categories_AddActivity.jpg)
-  - ![Add Custom Category](docs/screenshots/individual/CustomCat_Add.jpg)
-  - ![Settings](docs/screenshots/individual/SettingScreen.jpg)
-  - ![Permissions](docs/screenshots/individual/PermissionsScreen.jpg)
+  **Splash / Dashboard**
+  ![Splash → Onboarding](docs/screenshots/individual/SplashScreen_Onboarding1.jpg)
+  (docs/screenshots/individual/DashboardingScreen2_3.jpg)
+
+  **Authentication**
+    ![Login](docs/screenshots/individual/LoginScreen.jpg)
+    ![Register](docs/screenshots/individual/RegisterScreen.jpg)
+  **Timeline / Overview / Analytics**
+    ![Today Timeline](docs/screenshots/individual/DailyTimelineScreen.jpg)
+    ![Today Analytics](docs/screenshots/individual/TodaysAnalyticsScreen.jpg)
+    ![Weekly Overview](docs/screenshots/individual/WeeklyOverviewScreen.jpg)
+  **Features**
+    ![Add Activity](docs/screenshots/individual/AddActivity.jpg)
+    ![Activity Details & Edit](docs/screenshots/individual/ActitivtyDetails_Edit.jpg)
+    ![Steps Count Feature](docs/screenshots/individual/StepsCountFeature.jpg)
+  **Categories & Settings**
+    ![Categories in Add Activity](docs/screenshots/individual/Categories_AddActivity.jpg)
+    ![Add Custom Category](docs/screenshots/individual/CustomCat_Add.jpg)
+    ![Settings](docs/screenshots/individual/SettingScreen.jpg)
+    ![Permissions](docs/screenshots/individual/PermissionsScreen.jpg)
 
 All images referenced above exist under `docs/screenshots/` in this repository, so GitHub will render them correctly.
 
