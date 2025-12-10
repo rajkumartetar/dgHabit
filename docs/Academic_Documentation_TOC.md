@@ -188,6 +188,22 @@ All screenshots are generated automatically and stored under `docs/screenshots/i
 - Permissions (Camera first): ![permissions](./screenshots/individual/permissions.png)
 - Quick Actions (only steps): ![sheet_quick_actions](./screenshots/individual/sheet_quick_actions.png)
 
+Dark Mode Coverage:
+
+Every listed screen and sheet also has a dark theme counterpart generated via golden tests (suffix `_dark`). Example previews:
+
+- Home (Dark): ![home_dark](./screenshots/individual/home_dark.png)
+- Analytics (Dark): ![analytics_dark](./screenshots/individual/analytics_dark.png)
+- Activity Detail (Dark): ![activity_detail_dark](./screenshots/individual/activity_detail_dark.png)
+
+Generation Method:
+
+Golden tests (`test/generate_screenshots_test.dart`) render each screen twice—once with a light Material 3 seed palette and once with a dark variant—using deterministic mock data (activities, steps, per‑app usage). Animations are disabled for pixel stability. The process is reproducible with:
+
+```powershell
+flutter test --update-goldens test/generate_screenshots_test.dart
+```
+
 Testing approach:
 
 - Golden tests (golden_toolkit) produce deterministic screenshots
@@ -198,7 +214,7 @@ Testing approach:
 
 ## CHAPTER 6: FUTURE SCOPE AND ENHANCEMENT
 
-- Dark mode goldens and responsive tablet/desktop layouts
+- Responsive tablet/desktop layouts
 - Friendlier per‑app names/icons in Settings for limits
 - Replace usage stats stub with a native Android UsageStatsManager platform channel (query usage/events) to restore per‑app analytics and background per‑app limits in release builds
 - Upload progress indicators for meal photos and better offline handling (queued sync)

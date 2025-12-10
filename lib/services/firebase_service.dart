@@ -12,8 +12,9 @@ class OverlapInfo {
 }
 
 class FirebaseService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  // Lazily access Firebase instances to allow test fakes to subclass without initializing Firebase.
+  FirebaseAuth get _auth => FirebaseAuth.instance;
+  FirebaseFirestore get _db => FirebaseFirestore.instance;
 
   String get uid => _auth.currentUser!.uid;
 

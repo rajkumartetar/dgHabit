@@ -84,7 +84,8 @@ class DayTotal {
 }
 
 class AnalyticsScreen extends ConsumerWidget {
-  const AnalyticsScreen({super.key});
+  final bool? forceIsAndroid;
+  const AnalyticsScreen({super.key, this.forceIsAndroid});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -101,7 +102,7 @@ class AnalyticsScreen extends ConsumerWidget {
           Expanded(
             child: TabBarView(
               children: [
-                _TodayAnalytics(),
+                _TodayAnalytics(forceIsAndroid: forceIsAndroid),
                 _WeeklyOverview(),
               ],
             ),
@@ -247,6 +248,8 @@ class _WeeklyOverview extends ConsumerWidget {
 }
 
 class _TodayAnalytics extends ConsumerWidget {
+  final bool? forceIsAndroid;
+  const _TodayAnalytics({this.forceIsAndroid});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final todayCats = ref.watch(todayCategoryProvider);
@@ -310,7 +313,8 @@ class _TodayAnalytics extends ConsumerWidget {
         const SizedBox(height: 8),
         Text('Top apps screen time (today)', style: Theme.of(context).textTheme.titleMedium),
         Consumer(builder: (context, ref, _) {
-          if (!Platform.isAndroid) {
+          final isAndroid = forceIsAndroid ?? Platform.isAndroid;
+          if (!isAndroid) {
             return const ListTile(title: Text('App usage not available on this platform'));
           }
           final now = DateTime.now();
