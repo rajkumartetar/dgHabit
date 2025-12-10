@@ -1,74 +1,138 @@
 # dgHabit
 
-MSc IT Semester-3 Project — Daily Event Logger App using Flutter
+MSc IT Semester-3 Project — **Daily Habit & Event Logger** built with Flutter.
 
 Build habits, day by day — log activities, visualize trends, and grow.
 
-## Overview
+---
 
-- Flutter (Material 3), Riverpod, Firebase (Auth/Firestore)
-- Daily timeline with continuity handling (no-gap/overlap strategies)
-- Bottom-sheet UI for Add/Edit Activity, Settings, Permissions, and Category Manager
-- Analytics with weekly trends and category breakdowns
-- New: Meals category with photo upload and nutrition fields (calories, health score)
-- New: Local notifications for inactivity reminders and screen time checks
+## ✨ Features
 
-## Screenshots
+- 📱 **Flutter (Material 3)** UI with responsive layouts
+- 🔐 **Firebase Auth** (email / password)
+- ☁️ **Cloud Firestore** for storing activities and configuration
+- 📊 **Analytics dashboard**
+  - Weekly trends
+  - Category-wise breakdown
+- 📆 **Daily timeline** with continuity handling
+  - No gaps / overlap strategies
+  - Easy editing of past activities
+- ➕ **Bottom-sheet based UI** for:
+  - Add / Edit Activity
+  - Settings
+  - Permissions
+  - Category Manager
+- 🥗 **Meals category**
+  - Photo upload
+  - Nutrition fields (calories, health score)
+- 🔔 **Local notifications**
+  - Inactivity reminders
+  - Screen-time checks
 
-Composite: `docs/screenshots/all_screens.png`
+---
 
-Key screens (see more under `docs/screenshots/individual/`):
+## 🖼 Screenshots
 
-![Splash → Dashboard](docs/screenshots/individual/SplashScreen_Dashboarding1.jpg)
-![Login](docs/screenshots/individual/LoginScreen.jpg)
-![Register](docs/screenshots/individual/RegisterScreen.jpg)
-![Home / Today](docs/screenshots/individual/DailyTimelineScreen.jpg)
-![Today Analytics](docs/screenshots/individual/TodaysAnalyticsScreen.jpg)
-![Weekly Overview](docs/screenshots/individual/WeeklyOverviewScreen.jpg)
-![Dashboard Analytics](docs/screenshots/individual/DashboardingScreen2_3.jpg)
-![Add Activity](docs/screenshots/individual/AddActivity.jpg)
-![Activity Details & Edit](docs/screenshots/individual/ActitivtyDetails_Edit.jpg)
-![Steps Count Feature](docs/screenshots/individual/StepsCountFeature.jpg)
-![Categories in Add Activity](docs/screenshots/individual/Categories_AddActivity.jpg)
-![Add Custom Category](docs/screenshots/individual/CustomCat_Add.jpg)
-![Settings](docs/screenshots/individual/SettingScreen.jpg)
-![Permissions](docs/screenshots/individual/PermissionsScreen.jpg)
+Composite (all screens):
 
-## Development
+![All Screens](docs/screenshots/all_screens.png)
 
-1) Install Flutter and set up platforms.
-2) Configure Firebase (google-services.json / GoogleService-Info.plist).
-3) Run:
+Key individual screens (under `docs/screenshots/individual/`):
+
+- **Splash / Dashboard**
+  - ![Splash → Dashboard](docs/screenshots/individual/SplashScreen_Dashboarding1.jpg)
+- **Authentication**
+  - ![Login](docs/screenshots/individual/LoginScreen.jpg)
+  - ![Register](docs/screenshots/individual/RegisterScreen.jpg)
+- **Home / Timeline / Overview**
+  - ![Home / Today](docs/screenshots/individual/DailyTimelineScreen.jpg)
+  - ![Today Analytics](docs/screenshots/individual/TodaysAnalyticsScreen.jpg)
+  - ![Weekly Overview](docs/screenshots/individual/WeeklyOverviewScreen.jpg)
+  - ![Dashboard Analytics](docs/screenshots/individual/DashboardingScreen2_3.jpg)
+- **Activities & Details**
+  - ![Add Activity](docs/screenshots/individual/AddActivity.jpg)
+  - ![Activity Details & Edit](docs/screenshots/individual/ActitivtyDetails_Edit.jpg)
+  - ![Steps Count Feature](docs/screenshots/individual/StepsCountFeature.jpg)
+- **Categories & Settings**
+  - ![Categories in Add Activity](docs/screenshots/individual/Categories_AddActivity.jpg)
+  - ![Add Custom Category](docs/screenshots/individual/CustomCat_Add.jpg)
+  - ![Settings](docs/screenshots/individual/SettingScreen.jpg)
+  - ![Permissions](docs/screenshots/individual/PermissionsScreen.jpg)
+
+All images referenced above exist under `docs/screenshots/` in this repository, so GitHub will render them correctly.
+
+---
+
+## 🛠 Tech Stack
+
+- **Framework**: Flutter (Material 3)
+- **State Management**: Riverpod
+- **Backend**: Firebase Auth, Cloud Firestore, Firebase Storage
+- **Platforms**: Android, iOS, Web, Desktop (where supported by Flutter)
+
+---
+
+## 🚀 Getting Started
+
+1. **Clone the repo**
+   ```powershell
+   git clone https://github.com/rajkumartetar/dgHabit.git
+   cd dgHabit
+   ```
+
+2. **Install Flutter dependencies**
+   ```powershell
+   flutter pub get
+   ```
+
+3. **Configure Firebase**
+   - Add `google-services.json` to `android/app/` (Android)
+   - Add `GoogleService-Info.plist` to `ios/Runner/` (iOS)
+   - Ensure web Firebase configuration is set up if building for web.
+
+4. **Run the app**
+   ```powershell
+   flutter run
+   ```
+
+---
+
+## 🧪 Tests & Screenshot Generation
+
+To run tests:
 
 ```powershell
-flutter pub get
-flutter run
+flutter test
 ```
 
-## Generate documentation screenshots
+To regenerate documentation screenshots (goldens):
 
 ```powershell
-flutter test --update-goldens test/screenshots/golden_screens_test.dart
+flutter test --update-goldens test/generate_screenshots_test.dart
 ```
 
-Outputs are written to `docs/screenshots/` and `docs/screenshots/individual/`.
+Generated outputs are written to:
 
-## Design System
+- `docs/screenshots/`
+- `docs/screenshots/individual/`
 
-- **Colors**:
-  - AppBar background: 0xFF2DD4BF (mint green)
-  - AppBar foreground: White
-  - Schemes: Material 3 dynamic (light/dark)
+---
 
-- **Typography**:
-  - Sheet headers: TitleMedium, fontWeight: w700
-  - Body text: Default Material 3
+## 🎨 Design System
 
-- **Components**:
-  - Sheet headers: Padding 16h 4v, title + actions (close/save/delete)
-  - Buttons: FilledButton (primary), OutlinedButton (secondary)
-  - Lists: ListTile with dense/visualDensity compact
+- **Colors**
+  - Mint primary (e.g. `0xFF2DD4BF`) for highlights and AppBar
+  - Light & dark themes using Material 3 color schemes
+- **Typography**
+  - Sheet headers: `TitleMedium`, `fontWeight: w700`
+  - Body text: default Material 3 typography
+- **Components**
+  - Bottom sheets with padded headers and primary/secondary actions
+  - `FilledButton` (primary), `OutlinedButton` (secondary)
+  - Compact `ListTile` usage for dense lists
 
-## License
+---
 
-MIT (update if different)
+## 📄 License
+
+This project is licensed under the **MIT License** (update this section if the actual license differs).
