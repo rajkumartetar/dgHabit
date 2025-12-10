@@ -19,15 +19,20 @@ Composite: `docs/screenshots/all_screens.png`
 
 Key screens (see more under `docs/screenshots/individual/`):
 
-![Home](docs/screenshots/individual/home.png)
-![Timeline](docs/screenshots/individual/timeline.png)
-![Analytics](docs/screenshots/individual/analytics.png)
-![Add Activity (Sheet)](docs/screenshots/individual/sheet_add_activity.png)
-![Activity Detail (Sheet)](docs/screenshots/individual/sheet_activity_detail.png)
-![Settings (Sheet)](docs/screenshots/individual/sheet_settings.png)
-![Category Manager (Sheet)](docs/screenshots/individual/sheet_category_manager.png)
-![Permissions (Sheet)](docs/screenshots/individual/sheet_permissions.png)
-![Quick Actions (Sheet)](docs/screenshots/individual/sheet_quick_actions.png)
+![Splash → Dashboard](docs/screenshots/individual/SplashScreen_Dashboarding1.jpg)
+![Login](docs/screenshots/individual/LoginScreen.jpg)
+![Register](docs/screenshots/individual/RegisterScreen.jpg)
+![Home / Today](docs/screenshots/individual/DailyTimelineScreen.jpg)
+![Today Analytics](docs/screenshots/individual/TodaysAnalyticsScreen.jpg)
+![Weekly Overview](docs/screenshots/individual/WeeklyOverviewScreen.jpg)
+![Dashboard Analytics](docs/screenshots/individual/DashboardingScreen2_3.jpg)
+![Add Activity](docs/screenshots/individual/AddActivity.jpg)
+![Activity Details & Edit](docs/screenshots/individual/ActitivtyDetails_Edit.jpg)
+![Steps Count Feature](docs/screenshots/individual/StepsCountFeature.jpg)
+![Categories in Add Activity](docs/screenshots/individual/Categories_AddActivity.jpg)
+![Add Custom Category](docs/screenshots/individual/CustomCat_Add.jpg)
+![Settings](docs/screenshots/individual/SettingScreen.jpg)
+![Permissions](docs/screenshots/individual/PermissionsScreen.jpg)
 
 ## Development
 
