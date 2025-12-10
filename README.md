@@ -33,11 +33,8 @@ Build habits, day by day — log activities, visualize trends, and grow.
 
 ## 🖼 Screenshots
 
-Composite (all screens):
 
-![All Screens](docs/screenshots/all_screens.png)
-
-Key individual screens (under `docs/screenshots/individual/`):
+Screens (under `docs/screenshots/individual/`):
 
   **Splash / Dashboard**
   ![Splash → Onboarding](docs/screenshots/individual/SplashScreen_Onboarding1.jpg)
